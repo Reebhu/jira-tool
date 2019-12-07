@@ -1,6 +1,3 @@
-/**
- * 
- */
 package org.jira.tool.rest.config;
 
 import org.glassfish.jersey.jettison.JettisonFeature;
@@ -9,12 +6,13 @@ import org.jira.tool.rest.JiraResources;
 
 /**
  * @author RM067540
- *
  */
-public class MyApplication extends ResourceConfig {
-	/* Register JAX-RS application components. */
-	public MyApplication() {
-		register(JiraResources.class);
-		register(new JettisonFeature());
-	}
+public class MyApplication extends ResourceConfig
+{
+    /* Register JAX-RS application components. */
+    public MyApplication()
+    {
+        register(JiraResources.class);
+        register(new JettisonFeature());
+    }
 }
