@@ -18,7 +18,6 @@ public class JQLprocessor
 
     public static List<Issue> processJQL(final String jql, final String username, final String password)
     {
-
         final List<Issue> doneIssueList = new ArrayList<>();
 
         final URI jiraserverUri = URI.create("https://jira2.cerner.com");

@@ -25,16 +25,14 @@ import com.jira.tool.model.User;
 @Path("jira")
 public class JiraResources
 {
-
     private User user;
 
     @Path("user")
     @POST
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response setUser(final User user)
+    public Response login(final User user)
     {
-
         this.user = user;
 
         return Response.ok().build();
@@ -46,7 +44,6 @@ public class JiraResources
     @Consumes(MediaType.APPLICATION_JSON)
     public Response getIssuesCurrentUser()
     {
-
         final String jql = " assignee = currentUser() ";
 
         final Map<String, String> mapIssues = new HashMap<>();
