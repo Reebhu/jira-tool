@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -15,7 +16,6 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
 import com.atlassian.jira.rest.client.api.JiraRestClient;
-import com.atlassian.jira.rest.client.api.RestClientException;
 import com.atlassian.jira.rest.client.api.domain.Issue;
 import com.google.gson.Gson;
 import com.jira.tool.model.UserInput;
@@ -46,10 +46,12 @@ public class JiraResources
         try
         {
             UserRestClientUtil.getInstance(userInput.getUsername(), userInput.getPassword());
+            final JiraRestClient restClient = UserRestClientUtil.getInstance().getrestClient();
+            restClient.getUserClient().getUser(userInput.getUsername()).claim();
         }
-        catch (final RestClientException exception)
+        catch (final Exception exception)
         {
-            return Response.status(exception.getStatusCode().get()).entity("Invalid username or password").build(); //$NON-NLS-1$
+            return Response.status(Status.UNAUTHORIZED).entity("Invalid username or password").build(); //$NON-NLS-1$
         }
         return Response.ok().build();
     }
@@ -135,13 +137,17 @@ public class JiraResources
      * @return {@link Response} with user details.
      */
     @Path("logout")
-    @POST
+    @DELETE
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     public Response logout(final UserInput userInput)
     {
+        if (UserRestClientUtil.getInstance() == null)
+        {
+            return Response.status(Status.FORBIDDEN).entity("Please login").build();
+        }
         UserRestClientUtil.destroyInstance();
-        return Response.ok().build();
+        return Response.status(Status.NO_CONTENT).build();
     }
 
 }

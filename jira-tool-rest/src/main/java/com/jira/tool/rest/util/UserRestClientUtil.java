@@ -4,7 +4,6 @@ import java.net.URI;
 
 import com.atlassian.jira.rest.client.api.JiraRestClient;
 import com.atlassian.jira.rest.client.api.JiraRestClientFactory;
-import com.atlassian.jira.rest.client.api.RestClientException;
 import com.atlassian.jira.rest.client.internal.async.AsynchronousJiraRestClientFactory;
 
 /**
@@ -21,7 +20,7 @@ public class UserRestClientUtil
 
     }
 
-    public static UserRestClientUtil getInstance(final String username, final String password) throws RestClientException
+    public static UserRestClientUtil getInstance(final String username, final String password) throws Exception
     {
         if (INSTANCE == null)
         {
