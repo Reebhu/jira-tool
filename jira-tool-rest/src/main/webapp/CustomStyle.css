@@ -1,0 +1,17 @@
+hr 
+{ 
+  display: block;
+  margin-top: 0.5em;
+  margin-bottom: 0.5em;
+  margin-left: auto;
+  margin-right: auto;
+  border-style: !inset;
+  border-width: !3px;
+}
+
+.login-form
+{
+	border : 1px black;
+	border-radius : 1px;
+	padding : 50px;
+}
