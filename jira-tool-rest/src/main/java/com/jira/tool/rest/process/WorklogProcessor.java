@@ -3,6 +3,7 @@ package com.jira.tool.rest.process;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -113,6 +114,7 @@ public class WorklogProcessor
             set.setWorklogResponses(map.get(key));
             responseList.add(set);
         }
+        responseList.sort(Comparator.comparing(e -> e.getDate()));
         return responseList;
     }
 
