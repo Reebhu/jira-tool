@@ -1,4 +1,4 @@
-package org.jira.tool.rest.config;
+package com.jira.tool.rest.config;
 
 import javax.ws.rs.ApplicationPath;
 import javax.ws.rs.core.Application;

@@ -1,5 +1,7 @@
 package com.jira.tool.model;
 
+import java.net.URI;
+
 /**
  * @author RM067540
  */
@@ -7,6 +9,7 @@ public class User
 {
     private String username;
     private String password;
+    private String uri;
 
     /**
      * @return the username
@@ -40,5 +43,22 @@ public class User
     public void setPassword(final String password)
     {
         this.password = password;
+    }
+
+    /**
+     * @return the uRI
+     */
+    public URI getURI()
+    {
+        return URI.create(uri);
+    }
+
+    /**
+     * @param uRI
+     *            the uRI to set
+     */
+    public void setURI(final String uRI)
+    {
+        uri = uRI;
     }
 }

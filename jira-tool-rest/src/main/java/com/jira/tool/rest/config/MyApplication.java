@@ -1,8 +1,9 @@
-package org.jira.tool.rest.config;
+package com.jira.tool.rest.config;
 
 import org.glassfish.jersey.jettison.JettisonFeature;
 import org.glassfish.jersey.server.ResourceConfig;
-import org.jira.tool.rest.JiraResources;
+
+import com.jira.tool.rest.JiraResources;
 
 /**
  * @author RM067540
