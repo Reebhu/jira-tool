@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import com.atlassian.jira.rest.client.api.IssueRestClient;
@@ -52,9 +53,13 @@ public class WorklogProcessor
     {
         final List<Issue> issueList = Collections.synchronizedList(new ArrayList<>());
         final List<Iterable<Worklog>> iterList = new ArrayList<>();
-        new HashMap<>();
+        final Map<Long, Issue> issueMap = new HashMap<>();
         final SimpleDateFormat formatter = new SimpleDateFormat("MM/dd/yyyy");
         final IssueRestClient issueClient = restclient.getIssueClient();
+        for (final Issue issue : issues)
+        {
+            issueMap.put(issue.getId(), issue);
+        }
         int retry = 0;
         while (true)
         {
@@ -81,8 +86,8 @@ public class WorklogProcessor
             for (final Worklog work : iter)
             {
                 final WorklogResponse worklogResponse = new WorklogResponse();
-                final String[] split = work.getIssueUri().toString().split("/");
-                final Issue issue = searchissueByid(split[split.length - 1], issueList);
+                final String[] strArr = work.getIssueUri().toString().split("/");
+                final Issue issue = issueMap.get(Long.parseLong(strArr[strArr.length - 1]));
                 if (issue != null)
                 {
                     worklogResponse.setIssueKey(issue.getKey());
@@ -109,18 +114,6 @@ public class WorklogProcessor
             responseList.add(set);
         }
         return responseList;
-    }
-
-    private Issue searchissueByid(final String id, final List<Issue> list)
-    {
-        for (final Issue issue : list)
-        {
-            if (Long.parseLong(id) == (issue.getId()))
-            {
-                return issue;
-            }
-        }
-        return null;
     }
 
 }

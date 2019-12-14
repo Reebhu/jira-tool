@@ -51,7 +51,7 @@ public class JiraResources
         }
         catch (final Exception exception)
         {
-            return Response.status(Status.UNAUTHORIZED).entity("Invalid username or password").build(); //$NON-NLS-1$
+            return Response.status(Status.UNAUTHORIZED).entity(exception.getMessage()).build(); // $NON-NLS-1$
         }
         return Response.ok().build();
     }
@@ -138,14 +138,8 @@ public class JiraResources
      */
     @Path("logout")
     @DELETE
-    @Produces(MediaType.APPLICATION_JSON)
-    @Consumes(MediaType.APPLICATION_JSON)
-    public Response logout(final UserInput userInput)
+    public Response logout()
     {
-        if (UserRestClientUtil.getInstance() == null)
-        {
-            return Response.status(Status.FORBIDDEN).entity("Please login").build();
-        }
         UserRestClientUtil.destroyInstance();
         return Response.status(Status.NO_CONTENT).build();
     }
