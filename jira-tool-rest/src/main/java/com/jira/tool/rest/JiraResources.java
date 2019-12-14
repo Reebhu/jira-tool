@@ -4,7 +4,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.inject.Singleton;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -16,26 +15,21 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
 import com.atlassian.jira.rest.client.api.JiraRestClient;
-import com.atlassian.jira.rest.client.api.JiraRestClientFactory;
 import com.atlassian.jira.rest.client.api.RestClientException;
 import com.atlassian.jira.rest.client.api.domain.Issue;
-import com.atlassian.jira.rest.client.internal.async.AsynchronousJiraRestClientFactory;
 import com.google.gson.Gson;
-import com.jira.tool.model.User;
+import com.jira.tool.model.UserInput;
 import com.jira.tool.model.WorklogResponseSet;
 import com.jira.tool.rest.process.JQLprocessor;
 import com.jira.tool.rest.process.WorklogProcessor;
-import com.jira.tool.rest.util.StringLoader;
+import com.jira.tool.rest.util.UserRestClientUtil;
 
 /**
  * @author RM067540
  */
-@Singleton
 @Path("jira")
 public class JiraResources
 {
-    private User user;
-    private JiraRestClient restclient;
 
     /**
      * Allows creation of a user object used for basic authentication.
@@ -43,25 +37,21 @@ public class JiraResources
      *            populated using POST request.
      * @return {@link Response} with user details.
      */
-    @Path("user")
+    @Path("login")
     @POST
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response login(final User user)
+    public Response login(final UserInput userInput)
     {
-        this.user = user;
         try
         {
-            user.setURI(StringLoader.load("url", getClass()));
-
-            final JiraRestClientFactory factory = new AsynchronousJiraRestClientFactory();
-            restclient = factory.createWithBasicHttpAuthentication(user.getURI(), user.getUsername(), user.getPassword());
-            return Response.ok().entity(user).build();
+            UserRestClientUtil.getInstance(userInput.getUsername(), userInput.getPassword());
         }
         catch (final RestClientException exception)
         {
             return Response.status(exception.getStatusCode().get()).entity("Invalid username or password").build(); //$NON-NLS-1$
         }
+        return Response.ok().build();
     }
 
     /**
@@ -78,10 +68,6 @@ public class JiraResources
     @Consumes(MediaType.APPLICATION_JSON)
     public Response getIssuesCurrentUser(@QueryParam(value = "from") final String beginDate, @QueryParam(value = "to") final String endDate)
     {
-        if (!validateUser())
-        {
-            return badResponseInvalidUser();
-        }
         String jql = " assignee = currentUser() ";
         if (beginDate != null)
         {
@@ -91,10 +77,15 @@ public class JiraResources
         {
             jql = jql + " AND updatedDate <= " + endDate;
         }
+        if (UserRestClientUtil.getInstance() == null)
+        {
+            return Response.status(Status.FORBIDDEN).entity("Please login").build();
+        }
+        final JiraRestClient restClient = UserRestClientUtil.getInstance().getrestClient();
 
         final Map<String, String> mapIssues = new HashMap<>();
 
-        final List<Issue> issues = JQLprocessor.create(restclient).processJQL(jql);
+        final List<Issue> issues = JQLprocessor.create(restClient).processJQL(jql);
 
         for (final Issue issue : issues)
         {
@@ -114,14 +105,18 @@ public class JiraResources
     @Consumes(MediaType.APPLICATION_JSON)
     public Response getWorklogCurrentUser()
     {
-        if (!validateUser())
-        {
-            return badResponseInvalidUser();
-        }
         final String jql = " assignee = currentUser() AND worklogAuthor = currentUser()";
-        final List<Issue> issues = JQLprocessor.create(restclient).processJQL(jql);
 
-        final WorklogProcessor worklogProcessor = WorklogProcessor.getInstance(restclient);
+        if (UserRestClientUtil.getInstance() == null)
+        {
+            return Response.status(Status.FORBIDDEN).entity("Please login").build();
+        }
+
+        final JiraRestClient restClient = UserRestClientUtil.getInstance().getrestClient();
+
+        final List<Issue> issues = JQLprocessor.create(restClient).processJQL(jql);
+
+        final WorklogProcessor worklogProcessor = WorklogProcessor.getInstance(restClient);
         final List<WorklogResponseSet> map = worklogProcessor.processWorklog(issues);
         if (map == null)
         {
@@ -134,24 +129,19 @@ public class JiraResources
     }
 
     /**
-     * Validates a user once he has logged in.
-     * @return
+     * Allows creation of a user object used for basic authentication.
+     * @param user
+     *            populated using POST request.
+     * @return {@link Response} with user details.
      */
-    private boolean validateUser()
+    @Path("logout")
+    @POST
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response logout(final UserInput userInput)
     {
-        if (user == null || (user.getUsername() == null) || (user.getPassword() == null))
-        {
-            return false;
-        }
-        return true;
+        UserRestClientUtil.destroyInstance();
+        return Response.ok().build();
     }
 
-    /**
-     * Is returned when trying to access the endpoints without logging in.
-     * @return
-     */
-    private Response badResponseInvalidUser()
-    {
-        return Response.status(Status.FORBIDDEN).entity("Please login ").build(); //$NON-NLS-1$
-    }
 }
