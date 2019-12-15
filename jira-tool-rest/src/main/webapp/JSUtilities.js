@@ -37,7 +37,10 @@ function login()
 	 			logoutBtn.value = "Sign Out";
 	 			logoutBtn.setAttribute("onclick", "logout()");
 	 			document.getElementById("login-out-toggle").appendChild(logoutBtn);
-			 			
+	 			$('#usr_pswrd_tags').hide();
+	 			$('#usr_field').hide();
+	 			$('#pswrd_field').hide();
+	 			
 	 			document.getElementById("sidebar").style.display = "block";
  		}
  		else

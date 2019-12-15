@@ -5,6 +5,7 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="CustomStyle.css">
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+	<script src="jquery-3.4.1.min.js"></script>
 	<script src='JSUtilities.js'></script>
 </head>
 <body>
@@ -14,13 +15,13 @@
     		
     		<p align="right" style="margin-top: -90px">
     		<table cellpadding="10" style="border:2px;">
-    			<tr>
+    			<tr id="usr_pswrd_tags">
     				<td><p align="center"><font size="5" color="white" face="verdana"> Username </font></p>	</td>
     				<td><p align="center"><font size="5" color="white" face="verdana"> Password </font></p>	</td>	
     			</tr>	
 				<tr>
-					<td><input type="text" class="form-control" name="username" id="username" style="width: 220px;"></td>			
-					<td><input type="password" class="form-control" name="password" id="password" style="width: 220px;"></td>
+					<td id="usr_field"><input type="text" class="form-control" name="username" id="username" style="width: 220px;"></td>			
+					<td id="pswrd_field"><input type="password" class="form-control" name="password" id="password" style="width: 220px;"></td>
 					<td id="login-out-toggle">
 						<button type="button" id="login" class="btn btn-primary" onclick="login()"> 
 							<font size="3" face="verdana"> Sign In </font>
