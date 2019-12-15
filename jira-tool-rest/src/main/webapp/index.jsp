@@ -32,7 +32,8 @@
     	</div>
     	
     	<div class="sidenav" id="sidebar" style="display:none;">
-  			<p align="left" style="margin-top: 0px"><font size="6" color="white" face="verdana"><br/> &emsp; Jira Tool </font></p>
+  			<p align="left" style="margin-top: -15px"><font size="6" color="white" face="verdana"><br/> &emsp; Jira Tool </font></p>
+  			<br/>
   			<br/>
   			<br/>
   			<button type="button" id="login" class="btn btn-primary" onclick="getIssuesCurrentUser()"> 
@@ -45,8 +46,8 @@
 			</button>
 		</div>
 		
-		<div>
-			<table class="table" id="cardDetails" style="margin-left: 300px">
+		<div >
+			<table class="table-bordered table-hover" id="cardDetails" style="margin-left: 210px; margin-top: 10px; text-align: center">
 			</table>
 		</div>
 </body>
