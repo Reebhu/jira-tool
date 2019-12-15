@@ -1,6 +1,7 @@
 package com.jira.tool.rest.process;
 
 import java.text.SimpleDateFormat;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -9,6 +10,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Level;
 
 import com.atlassian.jira.rest.client.api.IssueRestClient;
 import com.atlassian.jira.rest.client.api.JiraRestClient;
@@ -18,6 +20,7 @@ import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import com.jira.tool.model.WorklogResponse;
 import com.jira.tool.model.WorklogResponseSet;
+import com.jira.tool.rest.util.logger.LoggingManager;
 
 /**
  * @author RM067540
@@ -62,6 +65,7 @@ public class WorklogProcessor
             issueMap.put(issue.getId(), issue);
         }
         int retry = 0;
+        final Instant before = Instant.now();
         while (true)
         {
             try
@@ -74,10 +78,13 @@ public class WorklogProcessor
                 retry++;
                 if (retry > 3)
                 {
-                    return null;
+                    throw exception;
                 }
             }
         }
+        final Instant after = Instant.now();
+        final String msg = String.valueOf((after.getEpochSecond() - before.getEpochSecond()));
+        LoggingManager.log(msg, Level.INFO, getClass());
         for (final Issue issue : issueList)
         {
             iterList.add(issue.getWorklogs());

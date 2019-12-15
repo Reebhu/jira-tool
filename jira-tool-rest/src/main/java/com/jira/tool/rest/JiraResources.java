@@ -3,6 +3,7 @@ package com.jira.tool.rest;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -15,6 +16,8 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
+
 import com.atlassian.jira.rest.client.api.JiraRestClient;
 import com.atlassian.jira.rest.client.api.domain.Issue;
 import com.google.gson.Gson;
@@ -23,6 +26,7 @@ import com.jira.tool.model.WorklogResponseSet;
 import com.jira.tool.rest.process.JQLprocessor;
 import com.jira.tool.rest.process.WorklogProcessor;
 import com.jira.tool.rest.util.UserRestClientUtil;
+import com.jira.tool.rest.util.logger.LoggingManager;
 
 /**
  * @author RM067540
@@ -51,6 +55,8 @@ public class JiraResources
         }
         catch (final Exception exception)
         {
+            LoggingManager.log(ExceptionUtils.getRootCauseMessage(exception), Level.SEVERE, getClass());
+
             return Response.status(Status.UNAUTHORIZED).entity(exception.getMessage()).build(); // $NON-NLS-1$
         }
         return Response.ok().build();
@@ -81,6 +87,7 @@ public class JiraResources
         }
         if (UserRestClientUtil.getInstance() == null)
         {
+            LoggingManager.log("UserRestClientUtil.getInstance() = null", Level.SEVERE, getClass());
             return Response.status(Status.FORBIDDEN).entity("Please login").build();
         }
         final JiraRestClient restClient = UserRestClientUtil.getInstance().getrestClient();
@@ -111,6 +118,7 @@ public class JiraResources
 
         if (UserRestClientUtil.getInstance() == null)
         {
+            LoggingManager.log("UserRestClientUtil.getInstance() = null", Level.SEVERE, getClass());
             return Response.status(Status.FORBIDDEN).entity("Please login").build();
         }
 
@@ -119,14 +127,18 @@ public class JiraResources
         final List<Issue> issues = JQLprocessor.create(restClient).processJQL(jql);
 
         final WorklogProcessor worklogProcessor = WorklogProcessor.getInstance(restClient);
-        final List<WorklogResponseSet> map = worklogProcessor.processWorklog(issues);
-        if (map == null)
+        try
         {
+            final List<WorklogResponseSet> map = worklogProcessor.processWorklog(issues);
+            final Gson gson = new Gson();
+            final String jsonString = gson.toJson(map);
+            return Response.status(Status.OK).entity(jsonString).build();
+        }
+        catch (final Exception exception)
+        {
+            LoggingManager.log(ExceptionUtils.getRootCauseMessage(exception), Level.SEVERE, getClass());
             return Response.status(Status.BAD_GATEWAY).build();
         }
-        final Gson gson = new Gson();
-        final String jsonString = gson.toJson(map);
-        return Response.status(Status.OK).entity(jsonString).build();
 
     }
 
