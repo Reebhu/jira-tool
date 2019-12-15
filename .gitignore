@@ -14,3 +14,4 @@ jira-tool-rest/.settings/org.eclipse.wst.common.component
 jira-tool-rest/.settings/.jsdtscope
 jira-tool-rest/.settings/org.eclipse.wst.jsdt.ui.superType.name
 jira-tool-rest/.settings/org.eclipse.jdt.ui.prefs
+*.lck
