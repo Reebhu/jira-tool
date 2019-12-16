@@ -1,7 +1,7 @@
 var username;
 var password;
 var url;
-
+var base64;
 function login()
 {
 	username = document.getElementById('username').value;
@@ -27,7 +27,7 @@ function login()
  		if(loginResponse.status === 200)
  		{
 	 			document.body.style.cursor = 'default';
-			 			
+			 	base64 = btoa(username+""+password);
 	 			var loginBtn = document.getElementById("login");
 	 			loginBtn.parentNode.removeChild(loginBtn);
 			 			
@@ -55,7 +55,12 @@ function getIssuesCurrentUser()
 	document.body.style.cursor = 'wait';
 	
 	url = "http://localhost:8080/jira-tool-rest/webapi/jira/issues";
-	fetch(url).then(function(response)
+	fetch(url,{
+		headers:
+		{
+			'Authorization': 'Basic '+ base64
+		}
+	}).then(function(response)
     {
 		  response.text().then(function(jsonResponse) 	
 		  {    
@@ -89,7 +94,12 @@ function getWorklogCurrentUser()
 	
 	url = "http://localhost:8080/jira-tool-rest/webapi/jira/worklog";
 	
-	fetch(url).then(function(response)
+	fetch(url,{
+		headers:
+		{
+			'Authorization': 'Basic '+ base64
+		}
+	}).then(function(response)
     {
 		  response.text().then(function(jsonResponse) 	
 		  {    
@@ -131,19 +141,10 @@ function logout()
 {
 	document.body.style.cursor = 'wait';
 	
-	url = "http://localhost:8080/jira-tool-rest/webapi/jira/logout";
-	
-	fetch(url, { method: 'DELETE'})
-	.then(function(logoutResponse)
-	{
-		if(logoutResponse.status === 204)
-		{
-			document.body.style.cursor = 'default';
-	 		window.open("http://localhost:8080/jira-tool-rest/");
-		}
-		else
-		{
-			alert("Logout failed");
-		}
-	});	
+    username = "";
+    password = "";
+    base64 = "";
+    document.body.style.cursor = 'default';
+	window.open("http://localhost:8080/jira-tool-rest/");
+
 }

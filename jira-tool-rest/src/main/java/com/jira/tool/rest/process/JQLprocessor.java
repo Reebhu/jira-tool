@@ -38,7 +38,6 @@ public class JQLprocessor
         for (final Issue issue : search.getIssues())
         {
             issueList.add(issue);
-
         }
 
         return issueList;
