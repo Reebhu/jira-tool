@@ -27,7 +27,7 @@ function login()
  		if(loginResponse.status === 200)
  		{
 	 			document.body.style.cursor = 'default';
-			 	base64 = btoa(username+""+password);
+			 	base64 = btoa(username+":"+password);
 	 			var loginBtn = document.getElementById("login");
 	 			loginBtn.parentNode.removeChild(loginBtn);
 			 			
