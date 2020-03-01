@@ -1,0 +1,161 @@
+swagger: '2.0'
+info:
+  title: Jira-rest-tool
+  description: JIRA tool to connect to jira through rest and perform various operations.
+  version: 0.0.1-SNAPSHOT
+# the domain of the service. For reference and testing use only, not used in generation of API.
+host: localhost:8080
+schemes:
+  - https
+# The base path on which the API is served, which is relative to the host. For reference and testing use only, not used in generation of API.
+basePath: /jira-tool-rest/webapi/jira
+produces:
+  - application/json
+paths: 
+  /issues:
+    get:
+      description: Retrieves a list of issues for current user.
+      operationId: getIssuesCurrentUser
+      produces:
+        - application/json
+      parameters:
+        - in: query
+          name: from
+          description: The date from when the issues need to be fetched
+          required: false
+          type: string
+          
+        - in: query
+          name: to
+          description: The date uto which issues need to be fetched
+          required: false
+          type: string
+        
+      responses:
+        '200':
+          description: Successful Response
+          schema:
+            $ref: '#/definitions/Issues'
+        '403':
+          description: Forbidden, trying to access without logging in.
+          
+
+
+  /login:
+    post:
+      description: Post request to login in the user.
+      operationId: login
+      consumes:
+        - application/json
+     
+      parameters:
+        - in: body
+          name: criteria
+          description: Criteria describing the medication statements and its status to be updated to.
+          required: true
+          schema:
+            $ref: '#/definitions/UserInput'
+      responses:
+        '200':
+          description: Successful Response
+        '401':
+          description: Invalid username or password
+
+  /logout:
+    delete:
+      description: logs the user out.
+      responses:
+        '204':
+          description: Successful Response
+          
+  /worklog:
+    get:
+      description: Retrievesworkloged by currentuser by date.
+      operationId: getWorklogCurrentUser
+      produces:
+        - application/json
+      
+      responses:
+        '200':
+          description: Successful Response
+          schema:
+            type: object
+            description: Medication statements by id.
+            additionalProperties:
+              $ref: '#/definitions/WorkLogList'
+        '403':
+          description: Forbidden, trying to access without logging in.
+        
+        '502':
+          description: Server couldn't connect to JIRA server.
+
+  
+definitions:
+  UserInput:
+    description: the data provided by user during logging in.
+    required:
+      - username
+      - password
+    properties:
+      username:
+        type: string
+        description: The jira server username.
+        
+      password:
+        type: string  
+        description: The password to login to jira.
+      
+
+  WorkLogList:
+    description: The list of all the work logged mapped to a date.
+    required:
+      - date
+      - workLogResponse
+    properties:
+      date:
+        type: string
+        description: The start date of the worklog
+        
+      workLogResponse:
+        type: array
+        description: The worklog response.
+        items:
+          $ref: '#/definitions/WorkLogResponse'
+      
+
+  WorkLogResponse:
+    description: The worklog response.
+    required:
+      - date
+      - issueKey
+      - issueSummary
+      - hoursLogged
+    properties:
+      date:
+        type: string
+        description: The start date of the worklog.
+      issueKey:
+        type: string
+        description: The issue key of the issue in which work has been logged.
+      issueSummary:
+        type: string
+        description: The issue summary of the issue in which the work has been logged.
+      hoursLogged:
+        type: number
+        description: The number of hours logged.
+      comment : 
+        type: string
+        description: The comment provide during worklog.
+  
+  Issues:
+    description: The JIRA issues.
+    required:
+      - issueKey
+      - issueSummary
+    properties:
+      issueKey:
+        type: string
+        description: The issue key of the issue in which work has been logged.
+      issueSummary:
+        type: string
+        description: The issue summary of the issue in which the work has been logged.
